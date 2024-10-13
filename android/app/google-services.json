@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "153876276311",
-    "firebase_url": "https://nfc-algorithm-default-rtdb.firebaseio.com",
-    "project_id": "nfc-algorithm",
-    "storage_bucket": "nfc-algorithm.appspot.com"
+    "project_number": "631392078440",
+    "project_id": "nfc-learning-2aaa2",
+    "storage_bucket": "nfc-learning-2aaa2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:153876276311:android:21eb9470f35148a59c6f12",
+        "mobilesdk_app_id": "1:631392078440:android:86a64a3c383dfa0f1dc9dd",
         "android_client_info": {
           "package_name": "com.example.okk"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBEKJayeRNl5Hva7m2yYwFCtjnkPtHH-Dg"
+          "current_key": "AIzaSyD9SpDfGp7tWd9R34j-CVfa4VdHHbq-63w"
         }
       ],
       "services": {
