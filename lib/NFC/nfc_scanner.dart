@@ -1,3 +1,4 @@
+/*
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:nfc_manager/nfc_manager.dart';
@@ -77,3 +78,4 @@ class NFCScanner {
     }
   }
 }
+*/

@@ -26,9 +26,8 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.example.okk"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
-
+    compileSdkVersion 36
+    buildToolsVersion "36.0.0"
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -41,9 +40,8 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.okk"
-        // 設置應用的 SDK 版本
         minSdkVersion 26
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -63,10 +61,10 @@ flutter {
 }
 
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:33.4.0')
+    implementation platform('com.google.firebase:firebase-bom:33.10.0')
     implementation("com.google.firebase:firebase-database")
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.android.gms:play-services-location:21.3.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.23"
-    implementation 'androidx.annotation:annotation:1.8.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0"
+    implementation 'androidx.annotation:annotation:1.9.1'
 }

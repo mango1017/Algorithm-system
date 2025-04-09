@@ -1,7 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- 添加 NFC 權限 -->
     <uses-permission android:name="android.permission.NFC" />
-    <!-- 聲明 NFC 功能 -->
     <uses-feature android:name="android.hardware.nfc" android:required="true" />
     <uses-permission android:name="android.permission.INTERNET" />
 
