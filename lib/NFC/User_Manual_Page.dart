@@ -11,7 +11,6 @@ class UserManualPage extends StatelessWidget {
       //   elevation: 0,
       // ),
       body: Container(
-        // 與主系統相同的漸層背景
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.indigo.shade50, Colors.indigo.shade100],
@@ -24,7 +23,6 @@ class UserManualPage extends StatelessWidget {
             padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
-                // 主標題
                 Text(
                   '操作手冊 / 使用者指南',
                   style: TextStyle(
@@ -36,7 +34,6 @@ class UserManualPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 20),
-                // 簡要引言
                 Text(
                   '歡迎使用「演算法學習系統」！本操作手冊將協助您快速了解操作流程與注意事項，'
                       '讓您能順利體驗遊戲化學習、動態評量與 AI 輔助之魅力。',
