@@ -79,3 +79,5 @@ flutter:
       - assets/mario.png
       - assets/assistant_robot.png
       - assets/smile_face.gif
+      - assets/ding.mp3
+      - assets/buzz.mp3
