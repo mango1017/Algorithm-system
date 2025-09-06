@@ -5,7 +5,7 @@
 
 
     <application
-        android:label="okk"
+        android:label="DyAlgo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

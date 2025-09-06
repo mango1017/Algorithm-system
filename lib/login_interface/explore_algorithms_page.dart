@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'algorithm_selection_page.dart';
+
 
 class ExploreAlgorithmsPage extends StatelessWidget {
   final List<AlgorithmInfo> algorithms = [
@@ -18,19 +18,6 @@ class ExploreAlgorithmsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Text(
-          '探索演算法',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey.shade800,
-          ),
-        ),
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -55,7 +42,7 @@ class ExploreAlgorithmsPage extends StatelessWidget {
   Widget _buildAlgorithmCard(AlgorithmInfo algorithm) {
     return Card(
       elevation: 4.0,
-      margin: EdgeInsets.only(bottom: 16.0),
+      margin: const EdgeInsets.only(bottom: 16.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
@@ -72,14 +59,14 @@ class ExploreAlgorithmsPage extends StatelessWidget {
                 color: Colors.grey.shade800,
               ),
             ),
-            SizedBox(height: 12.0),
+            const SizedBox(height: 12.0),
             Image.asset(
               algorithm.gifPath,
               height: 200,
               width: double.infinity,
               fit: BoxFit.contain,
             ),
-            SizedBox(height: 12.0),
+            const SizedBox(height: 12.0),
             Text(
               algorithm.description,
               style: TextStyle(

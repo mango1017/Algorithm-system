@@ -1,4 +1,4 @@
-package com.example.okk
+package com.example.DyAlgo
 
 import io.flutter.embedding.android.FlutterActivity
 

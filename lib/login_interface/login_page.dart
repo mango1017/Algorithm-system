@@ -15,9 +15,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '演算法學習',
+      title: 'DyAlgo演算法學習系統',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.grey,
+        primarySwatch: Colors.indigo,
+        scaffoldBackgroundColor: Colors.indigo.shade50,
       ),
       home: LoginPage(),
     );
@@ -36,129 +38,208 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _schoolController = TextEditingController();
 
   @override
+  void dispose() {
+    _studentIdController.dispose();
+    _nameController.dispose();
+    _schoolController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.grey.shade200, Colors.grey.shade400],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
+      backgroundColor: Colors.indigo.shade50,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'DyAlgo演算法學習系統',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo.shade800,
+                ),
+                textAlign: TextAlign.center,
               ),
-              color: Colors.white.withOpacity(0.85),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 24.0),
+              const SizedBox(height: 8),
+              Text(
+                '請輸入以下資訊以登入',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.07),
+                      blurRadius: 12,
+                      offset: Offset(0, 6),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 32,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Icon(
-                        Icons.school,
-                        size: 60,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 16.0),
-                      const Text(
-                        '歡迎來到演算法學習',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 30.0),
-                      _buildTextField(
+                    children: [
+                      TextFormField(
                         controller: _studentIdController,
-                        label: '學號',
-                        icon: Icons.confirmation_number,
+                        decoration: InputDecoration(
+                          labelText: '學號',
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 16),
+                          labelStyle: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                                color: Colors.grey.shade300, width: 1.5),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                            BorderSide(color: Colors.indigo, width: 2),
+                          ),
+                        ),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade800,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return '請輸入學號';
+                          }
+                          return null;
+                        },
                       ),
-                      const SizedBox(height: 20.0),
-                      _buildTextField(
+                      const SizedBox(height: 20),
+
+                      TextFormField(
                         controller: _nameController,
-                        label: '姓名',
-                        icon: Icons.person,
+                        decoration: InputDecoration(
+                          labelText: '姓名',
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 16),
+                          labelStyle: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                                color: Colors.grey.shade300, width: 1.5),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                            BorderSide(color: Colors.indigo, width: 2),
+                          ),
+                        ),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade800,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return '請輸入姓名';
+                          }
+                          return null;
+                        },
                       ),
-                      const SizedBox(height: 20.0),
-                      _buildTextField(
+                      const SizedBox(height: 20),
+
+                      TextFormField(
                         controller: _schoolController,
-                        label: '學校',
-                        icon: Icons.school,
+                        decoration: InputDecoration(
+                          labelText: '學校',
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 16),
+                          labelStyle: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                                color: Colors.grey.shade300, width: 1.5),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                            BorderSide(color: Colors.indigo, width: 2),
+                          ),
+                        ),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade800,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return '請輸入學校';
+                          }
+                          return null;
+                        },
                       ),
-                      const SizedBox(height: 30.0),
-                      _buildSubmitButton(context),
+                      const SizedBox(height: 32),
+
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      AlgorithmLearningPage(),
+                                ),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.indigo,
+                            foregroundColor: Colors.white,
+                            elevation: 4,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          child: Text('登入'),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ),
-      ),
-    );
-  }
-
-  /// 建立輸入框的 Widget
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-  }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.grey.shade800),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        prefixIcon: Icon(icon, color: Colors.grey.shade800),
-        filled: true,
-        fillColor: Colors.grey.shade100,
-      ),
-      style: TextStyle(color: Colors.black87),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return '請輸入$label';
-        }
-        return null;
-      },
-    );
-  }
-
-  /// 建立提交按鈕的 Widget
-  Widget _buildSubmitButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => AlgorithmLearningPage()),
-            );
-          }
-        },
-        child: const Text('提交'),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          backgroundColor: Colors.grey.shade800,
-          foregroundColor: Colors.white,
-          elevation: 3,
         ),
       ),
     );

@@ -1,15 +1,16 @@
 {
   "project_info": {
     "project_number": "631392078440",
+    "firebase_url": "https://nfc-learning-2aaa2-default-rtdb.firebaseio.com",
     "project_id": "nfc-learning-2aaa2",
-    "storage_bucket": "nfc-learning-2aaa2.appspot.com"
+    "storage_bucket": "nfc-learning-2aaa2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:631392078440:android:86a64a3c383dfa0f1dc9dd",
+        "mobilesdk_app_id": "1:631392078440:android:b0a6a253d3edd81d1dc9dd",
         "android_client_info": {
-          "package_name": "com.example.okk"
+          "package_name": "com.example.DyAlgo"
         }
       },
       "oauth_client": [],

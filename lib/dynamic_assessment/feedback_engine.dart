@@ -1,172 +1,223 @@
+// feedback_engine.dart
+// ─────────────────────────────────────────────────────────────
+//  Flutter + OpenAI 漸進式動態評量核心模組  (NOM + TMC)
+//  • 走訪順序錯誤偵測 (Node Order Misplacement, NOM)
+//  • 演算法混淆偵測 (Traversal Mode Confusion, TMC)
+//  • 提示層級 L1–L4 + 滿分提示
+//  • 四級總評：滿分 / 完全掌握 / 接近掌握 / 有進步空間 / 需要加強理解
+//  • LLM 最終一次回饋依分級與誤區自動套用模板 (L4 直接提供完整走訪)
+// ─────────────────────────────────────────────────────────────
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:okk/Tree logic/tree_logic_interface.dart';
+import 'package:DyAlgo/Tree logic/tree_logic_interface.dart';
 
-/*─────────────────────────────────────────────
-  ASCII‑TREE 輔助函式（全部保留）
-─────────────────────────────────────────────*/
-String generateAsciiTree(
-    TreeNode? node, [
-      String indent = '',
-      bool isLeft = true,
-    ]) {
-  if (node == null) return '';
-  var res = '';
-  if (node.right != null) {
-    res += generateAsciiTree(
-      node.right,
-      indent + (isLeft ? '│   ' : '    '),
-      false,
-    );
-  }
-  res += indent;
-  res += isLeft ? '└── ' : '┌── ';
-  res += '${node.index}\n';
-  if (node.left != null) {
-    res += generateAsciiTree(
-      node.left,
-      indent + (isLeft ? '    ' : '│   '),
-      true,
-    );
-  }
-  return res;
+/*────────────────────── 0.  基本型別 ──────────────────────*/
+enum MisCode { NOM, TMC }
+enum HintLevel { none, L1, L2, L3, L4 }
+
+class MisStat {
+  int hit = 0;
+  int total = 0;
+  HintLevel hint = HintLevel.none;
+  double get rate => total == 0 ? 0.0 : hit / total;
 }
 
-String prettyPrintTree(TreeNode? root) {
-  if (root == null) return '';
-  final levels = <List<String>>[];
-  var queue = <TreeNode?>[root];
-  while (queue.any((n) => n != null)) {
-    final level = <String>[];
-    final next = <TreeNode?>[];
-    for (final n in queue) {
-      if (n == null) {
-        level.add(' ');
-        next.addAll([null, null]);
-      } else {
-        level.add('${n.index}');
-        next.addAll([n.left, n.right]);
-      }
-    }
-    levels.add(level);
-    queue = next;
+HintLevel nextHint(HintLevel h) =>
+    h.index < HintLevel.L4.index ? HintLevel.values[h.index + 1] : HintLevel.L4;
+
+bool listsEqual<T>(List<T> a, List<T> b) {
+  if (a.length != b.length) return false;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) return false;
   }
-  return levels.map((l) => l.join('   ')).join('\n');
+  return true;
 }
 
-String computeErrorLevel({
-  required double scoreChange,
-  required double scoreSpan,
+/*────────────────────── 1.  Tree ASCII & JSON ─────────────────────*/
+String generateAsciiTree(TreeNode? n, [String ind = '', bool isLeft = true]) {
+  if (n == null) return '';
+  final buffer = StringBuffer();
+  if (n.right != null) {
+    buffer.write(
+      generateAsciiTree(
+        n.right,
+        ind + (isLeft ? '│   ' : '    '),
+        false,
+      ),
+    );
+  }
+  buffer.writeln('${ind}${isLeft ? '└── ' : '┌── '}${n.index}');
+  if (n.left != null) {
+    buffer.write(
+      generateAsciiTree(
+        n.left,
+        ind + (isLeft ? '    ' : '│   '),
+        true,
+      ),
+    );
+  }
+  return buffer.toString();
+}
+
+Map<String, dynamic>? treeToJson(TreeNode? n) {
+  if (n == null) return null;
+  return {
+    'value': n.index,
+    'left': treeToJson(n.left),
+    'right': treeToJson(n.right),
+  };
+}
+
+/*────────────────────── 2.  迷思概念定義 ─────────────────────*/
+// 走訪順序錯誤偵測 (Node Order Misplacement, NOM)
+bool detectNOM({
+  required List<String> userSeq,
+  required List<String> correctSeq,
+  required MisStat stat,
 }) {
-  if (scoreChange >= 90 && scoreSpan >= 90) return '完全掌握';
-  if (scoreChange >= 75 && scoreSpan >= 75) return '接近掌握';
-  if (scoreChange >= 50 && scoreSpan >= 50) return '有進步空間';
+  stat.total++;
+  for (var i = 1; i < userSeq.length; i++) {
+    final prev = correctSeq.indexOf(userSeq[i - 1]);
+    final cur  = correctSeq.indexOf(userSeq[i]);
+    if (cur < prev) {
+      stat.hit++;
+      stat.hint = nextHint(stat.hint);
+      return true;
+    }
+  }
+  return false;
+}
+
+// TMC（Traversal Mode Confusion）
+bool detectTraversalModeConfusion({
+  required List<String> userSeq,
+  required List<String> bfsSeq,
+  required List<String> dfsSeq,
+  required MisStat stat,
+}) {
+  stat.total++;
+  if (listsEqual(userSeq, bfsSeq) && !listsEqual(bfsSeq, dfsSeq)) {
+    stat.hit++;
+    stat.hint = nextHint(stat.hint);
+    return true;
+  }
+  if (listsEqual(userSeq, dfsSeq) && !listsEqual(bfsSeq, dfsSeq)) {
+    stat.hit++;
+    stat.hint = nextHint(stat.hint);
+    return true;
+  }
+  return false;
+}
+
+/*────────────────────── 3.  四級總評 ─────────────────────*/
+String progressiveLevel({
+  required double score,
+  required Map<MisCode, MisStat> stats,
+}) {
+  // 累計 NOM 與 TMC 的誤區次數
+  final int errorCount = stats[MisCode.NOM]!.hit + stats[MisCode.TMC]!.hit;
+
+  // 同時檢查分數與誤區次數
+  if (score == 100.0 && errorCount == 0) {
+    return '滿分';
+  }
+  if (score >= 90.0 && errorCount == 0) {
+    return '接近完全理解';
+  }
+  if (score >= 75.0 && errorCount <= 1) {
+    return '接近掌握';
+  }
+  if (score >= 50.0 && errorCount <= 2) {
+    return '有進步空間';
+  }
   return '需要加強理解';
 }
 
-/*─────────────────────────────────────────────
-  動態評量回饋函式
-─────────────────────────────────────────────*/
+
+/*────────────────────── 4.  LLM 回饋 ─────────────────────*/
 Future<String> generateAiFeedback({
-  required String mode,
-  required List<String> userUids,
-  required List<String> correctUids,
+  required String treeType,
   required String algorithm,
-  String? treeVisualization,
-  String? errorInfo,
-  String? learningHistory,
-  double? score,
+  required Map<MisCode, MisStat> stats,
+  required String level,      // "滿分" | "完全掌握" | "接近掌握" | "有進步空間" | "需要加強理解"
+  required String misCode,    // "NOM" | "TMC"
+  required double score,
+  required List<int> userIndices,
+  required List<int> correctIndices,
 }) async {
-  if (mode != 'dynamic') {
-    return '目前僅支援 dynamic 模式，請將 mode 設為 "dynamic"。';
-  }
+  const apiKey = 'YOUR_OPENAI_API_KEY_H';
 
-  /*------------ OpenAI 設定 ------------*/
-  const apiUrl = 'https://api.openai.com/v1/chat/completions';
-  const apiKey = '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';
-  if (apiKey.isEmpty) return '無法取得 OpenAI API Key';
+  // 1. 系統提示：內含格式範本，並要求嚴格遵守
+  final systemPrompt = '''
+你是一位演算法專家，專注於樹的走訪教學（BFS/DFS）。
+請嚴格遵守下列「提示層級」定義，並且：
+  • 只回應與走訪錯誤相關的回饋；
+  • 不要輸出任何程式碼；
+  • 使用繁體中文；
 
-  /*------------ 可選區塊 ------------*/
-  final treeSection = (treeVisualization?.isNotEmpty ?? false)
-      ? '[二元樹視覺化]:\n$treeVisualization\n'
-      : '';
+── 提示層級：$level ──
 
-  final errorSection =
-  (errorInfo?.isNotEmpty ?? false) ? '[錯誤資訊]:\n$errorInfo\n' : '';
+當 level == '滿分'：
+  只回應「恭喜你！完全掌握了這個演算法！」
 
-  final historySection = (learningHistory?.isNotEmpty ?? false)
-      ? '[學習歷程資訊]:\n$learningHistory\n'
-      : '';
+當 level == '接近完全理解'（對應 L1）：
+  簡短回覆「正確」或「錯誤」，並附上一個關鍵字提示
+  例如：「錯誤 —— 注意左子節點優先」
 
-  /*------------ 格式模板（*唯一改動*） ------------*/
-  const formatTemplate = '''
-【提示格式】
-【學習進展】：
-<請依下列分級規則輸出：完全掌握 / 接近掌握 / 有進步空間 / 需要加強理解（擇一），回答請控制在 100 tokens 內>
+當 level == '接近掌握'（對應 L2）：
+  以一句話指出錯誤關鍵，或提出一句引導式問題
 
-[分級規則]：
-1) Score_change ≥ 90 且 Score_span ≥ 90  → 完全掌握
-2) Score_change ≥ 75 且 Score_span ≥ 75  → 接近掌握
-3) Score_change ≥ 50 且 Score_span ≥ 50  → 有進步空間
-4) 其他                                      → 需要加強理解
+當 level == '有進步空間'（對應 L3）：
+  提供範例、步驟提示，促進思維重構
 
-【改進建議】：
-<分別針對 Score_change 與 Score_span 提出 1–2 句最關鍵建議，總長度 ≤ 150 tokens>
+當 level == '需要加強理解'（對應 L4）：
+  完整列出正確走訪序列，並附簡要解析關鍵邏輯
 
-【二元樹視覺化及走訪描述】：
-<引用系統提供之視覺化並描述走訪結果中的關鍵差異，總長度 ≤ 150 tokens>
+── 嚴格格式──
+請**只**以以下格式回覆，**不要**額外加任何文字：
 
-請嚴格依此格式輸出，且完整回答不要超過 400 tokens。
+掌握層級：$level
+
+學習建議：<請依 $level 規則，使用流暢句子提供回饋>
 ''';
 
-  /*------------ 動態 prompt ------------*/
-  final dynamicPrompt = '''
-【漸進式動態評量指引】：
-請根據下列資料直接比較「使用者走訪順序」與「正確走訪順序」，並套用上方格式模板輸出：
-
-[使用者走訪順序]: ${userUids.join(' -> ')}
-[正確走訪順序]: ${correctUids.join(' -> ')}
-
-$treeSection$errorSection$historySection
+  // 2. 用戶 Prompt：樹型、演算法、使用者＆正確走訪序列
+  final userPrompt = '''
+【樹型】 $treeType
+【演算法】 $algorithm
+【使用者走訪 (index)】 ${userIndices.join(' -> ')}
+【正確走訪 (index)】 ${correctIndices.join(' -> ')}
 ''';
 
-  final combinedPrompt = '''
-$formatTemplate
-$dynamicPrompt
-''';
-
-  /*------------ 呼叫 OpenAI ------------*/
-  final requestBody = jsonEncode({
-    'model': 'o3-mini-2025-01-31',
+  // 3. 呼叫 OpenAI API
+  final payload = {
+    'model': 'o4-mini',
     'messages': [
-      {
-        'role': 'system',
-        'content':
-        '你是一位演算法教學助理，請依格式模板返回結構化回饋，並遵守 tokens 限制。'
-      },
-      {'role': 'user', 'content': combinedPrompt}
+      {'role': 'system', 'content': systemPrompt},
+      {'role': 'user',   'content': userPrompt},
     ],
     'max_completion_tokens': 1500,
-    'stop': ['【提示格式】']
-  });
+  };
 
-  try {
-    final res = await http.post(
-      Uri.parse(apiUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
-      },
-      body: requestBody,
-    );
+  final res = await http.post(
+    Uri.parse('https://api.openai.com/v1/chat/completions'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $apiKey',
+    },
+    body: jsonEncode(payload),
+  );
 
-    if (res.statusCode == 200) {
-      final data = json.decode(utf8.decode(res.bodyBytes));
-      final txt = data['choices'][0]['message']['content'] ?? '';
-      return txt.trim().isEmpty ? 'AI 回傳為空，請檢查 prompt。' : txt.trim();
-    }
-    return 'OpenAI 回應錯誤 (${res.statusCode})\\n${res.body}';
-  } catch (e) {
-    return '請求失敗：$e';
+  if (res.statusCode != 200) {
+    throw Exception('OpenAI API Error ${res.statusCode}: ${res.body}');
   }
+
+  final data = jsonDecode(res.body);
+  final content = data['choices']?[0]?['message']?['content'] as String? ?? '';
+  return content.trim();
 }
+
+
+
+

@@ -13,10 +13,10 @@ class _AlgorithmLearningPageState extends State<AlgorithmLearningPage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    AlgorithmSelectionPage(), // 演算法選擇（首頁）
-    ExploreAlgorithmsPage(),  // 探索演算法
-    LearnAlgorithmPage(),     // 學習演算法
-    UserManualPage(),         // 使用者指南
+    const AlgorithmSelectionPage(), // 演算法選擇（首頁）
+    ExploreAlgorithmsPage(),        // 探索演算法
+    LearnAlgorithmPage(),           // 學習演算法
+    UserManualPage(),               // 使用者指南
   ];
 
   void _onItemTapped(int index) {
@@ -29,7 +29,9 @@ class _AlgorithmLearningPageState extends State<AlgorithmLearningPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('演算法學習'),
+        title: const Text('演算法學習系統'),
+        backgroundColor: const Color(0xFF26C6DA),
+        elevation: 0,
       ),
       body: IndexedStack(
         index: _selectedIndex,
@@ -43,9 +45,11 @@ class _AlgorithmLearningPageState extends State<AlgorithmLearningPage> {
           BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: '使用者指南'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.black,
+        selectedItemColor: const Color(0xFF26C6DA),
+        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
+        backgroundColor: Colors.white,
+        elevation: 8,
       ),
     );
   }

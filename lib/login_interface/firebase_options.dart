@@ -23,9 +23,15 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
@@ -41,46 +47,32 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCfWEtc0H55mmqJtsSCyRPvx4jn-F6ODcI',
-    appId: '1:631392078440:web:33bac000c9def5bb1dc9dd',
+    apiKey: 'AIzaSyAdcgRuCXVhjUXfFSLLCWlLuhbDwqLWvQ4',
+    appId: '1:631392078440:web:a13819fdb01a324d1dc9dd',
     messagingSenderId: '631392078440',
     projectId: 'nfc-learning-2aaa2',
     authDomain: 'nfc-learning-2aaa2.firebaseapp.com',
-    storageBucket: 'nfc-learning-2aaa2.appspot.com',
+    databaseURL: 'https://nfc-learning-2aaa2-default-rtdb.firebaseio.com',
+    storageBucket: 'nfc-learning-2aaa2.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyD9SpDfGp7tWd9R34j-CVfa4VdHHbq-63w',
-    appId: '1:631392078440:android:86a64a3c383dfa0f1dc9dd',
+    appId: '1:631392078440:android:b0a6a253d3edd81d1dc9dd',
     messagingSenderId: '631392078440',
     projectId: 'nfc-learning-2aaa2',
-    storageBucket: 'nfc-learning-2aaa2.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAZ_b028n4pcaWzkuoyo19bgP41QV-TeiM',
-    appId: '1:631392078440:ios:71630315f6079db21dc9dd',
-    messagingSenderId: '631392078440',
-    projectId: 'nfc-learning-2aaa2',
-    storageBucket: 'nfc-learning-2aaa2.appspot.com',
-    iosBundleId: 'com.example.okk',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAZ_b028n4pcaWzkuoyo19bgP41QV-TeiM',
-    appId: '1:631392078440:ios:71630315f6079db21dc9dd',
-    messagingSenderId: '631392078440',
-    projectId: 'nfc-learning-2aaa2',
-    storageBucket: 'nfc-learning-2aaa2.appspot.com',
-    iosBundleId: 'com.example.okk',
+    databaseURL: 'https://nfc-learning-2aaa2-default-rtdb.firebaseio.com',
+    storageBucket: 'nfc-learning-2aaa2.firebasestorage.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCfWEtc0H55mmqJtsSCyRPvx4jn-F6ODcI',
-    appId: '1:631392078440:web:e50a8ba1edb4a40b1dc9dd',
+    apiKey: 'AIzaSyAdcgRuCXVhjUXfFSLLCWlLuhbDwqLWvQ4',
+    appId: '1:631392078440:web:79d62ff66a04820c1dc9dd',
     messagingSenderId: '631392078440',
     projectId: 'nfc-learning-2aaa2',
     authDomain: 'nfc-learning-2aaa2.firebaseapp.com',
-    storageBucket: 'nfc-learning-2aaa2.appspot.com',
+    databaseURL: 'https://nfc-learning-2aaa2-default-rtdb.firebaseio.com',
+    storageBucket: 'nfc-learning-2aaa2.firebasestorage.app',
   );
+
 }
