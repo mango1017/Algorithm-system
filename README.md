@@ -1,16 +1,15 @@
-# okk
+---專案簡介
+DyAlgo 是一套專為演算法教學設計的智慧學習系統，結合 動態評量 (Dynamic Assessment) 與 體現式學習 (Embodied Learning)，並搭配 NFC 實體互動 與 大型語言模型 (LLM)，幫助學習者更直觀地理解 深度優先搜尋 (DFS) 與 廣度優先搜尋 (BFS) 演算法。
+本系統的特色在於將抽象的演算法過程轉化為可操作的實體學習體驗，並提供即時、漸進式回饋，提升學習效果與互動性。
 
-A new Flutter project.
+---功能特色
 
-## Getting Started
+演算法視覺化：即時顯示 DFS 與 BFS 的走訪流程。
 
-This project is a starting point for a Flutter application.
+體現式互動：透過 NFC 標籤操作樹狀結構節點，模擬演算法流程。
 
-A few resources to get you started if this is your first Flutter project:
+動態評量機制：依據錯誤操作提供分級提示，協助釐清迷思概念。
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+AI 助教回饋：整合大型語言模型，生成個人化且即時的學習回饋。
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+雲端學習歷程追蹤：利用 Firebase 儲存操作數據與學習成果，供教師與研究使用。
